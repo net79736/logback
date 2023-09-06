@@ -2,6 +2,7 @@ package com.logbackGroup.logback.configuration;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -18,14 +19,21 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
+@Slf4j
 @Configuration
 @ComponentScan("com.logbackGroup.logback")
 @MapperScan
 @EnableTransactionManagement //트랜잭션을 활성화
 public class DatabaseConfiguration {
 
-  @Autowired
-  private ApplicationContext applicationContext;
+  /**
+   * TRACE < DEBUG < INFO < WARN < ERROR
+   */
+  public DatabaseConfiguration(ApplicationContext applicationContext) {
+    log.info("DatabaseConfiguration 생성자 메소드 출력(info)");
+    log.debug("DatabaseConfiguration 생성자 메소드 출력(debug)");
+    log.warn("DatabaseConfiguration 생성자 메소드 출력(warn)");
+  }
 
   @Bean
   @ConfigurationProperties(prefix = "spring.datasource.hikari")

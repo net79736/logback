@@ -6,6 +6,10 @@
     <property name="logdir" value="D:\Workspace\LogFiles"/>
     <!--<include resource="org/springframework/boot/logging/logback/defaults.xml"/>-->
 
+    <!-- 외부 설정 파일을 사용하여 위의 property 태그를 만들어 보려고 한다. -->
+    <property resource="properties/logback.properties"/>
+    <property resource="application.properties"/>
+
     <!-- Appenders (현재 설정은 콘솔에 출력이 되는 설정이다.)-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!--DEBUG이상의 레벨을 출력을 하겠다.-->
@@ -17,10 +21,6 @@
             <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] %logger{30} %msg%n</pattern>
         </encoder>
     </appender>
-
-    <!-- 외부 설정파일을 사용 -->
-    <property resource="properties/logback.properties"/>
-    <property resource="application.properties"/>
 
     <!--파일 로깅 관련한 설정-->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -36,19 +36,15 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="jdbc" level="OFF"/>
-    <logger name="jdbc.sqlonly" level="OFF"/>
-    <logger name="jdbc.sqltiming" level="DEBUG"/>
-    <logger name="jdbc.audit" level="OFF"/>
-    <logger name="jdbc.resultset" level="OFF"/>
-    <logger name="jdbc.resultsettable" level="DEBUG"/>
-    <logger name="jdbc.connection" level="OFF"/>
+    <logger name="org.springframework" level="OFF"/>
+    <!--logback 패키지는 WARN 레벨 이상만 출력하겠다.-->
+    <logger name="com.logbackGroup.logback.infotest" level="INFO"/>
+    <!--logback.configurationi 패키지는 WARN 레벨 이상만 출력하겠다.-->
+    <logger name="com.logbackGroup.logback.configuration" level="DEBUG"/>
 
-    <!--
-        추가를 하고자하는 appender를 아래에 등록시키면 된다.
-        ref는 위의 appender의 이름과 매칭이 되어야 한다.
-    -->
-    <root level="DEBUG">
+    <!-- 모든 패키지의 로그 중 INFO 레벨 이상만 출력하겠다면 root 레벨을 INFO로 변경한다. -->
+    <!-- 아래는 모든 패키지의 로그를 꺼버리고 뒤에서 overwrite한 logger 에서만 로그를 출력한다.  -->
+    <root level="OFF">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>

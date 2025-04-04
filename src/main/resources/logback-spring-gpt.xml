@@ -14,7 +14,7 @@
     <property name="log.file.full" value="${log.file.dir}/${log.file.name}"/>
     <!-- 롤링 백업 파일명 패턴 -->
     <property name="log.file.backup.fileNamePattern"
-              value="C:/logs/gpt-qna-serve_%d{yyyy-MM-dd}.log"/>
+              value="C:/logs/gpt-qna-serve_%d{yyyy-MM-dd}_%i.log"/>
     <!-- 로그 출력 포맷 -->
     <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss} [${HOSTNAME}] [%-5level] %logger{35}:%L - %msg%n"/>
 
@@ -37,7 +37,7 @@
         <encoder>
             <pattern>${log.pattern}</pattern>
         </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.file.backup.fileNamePattern}</fileNamePattern>
             <maxFileSize>20MB</maxFileSize>
             <maxHistory>50</maxHistory>

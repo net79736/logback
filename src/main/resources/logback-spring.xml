@@ -10,6 +10,12 @@
     <property name="logdir" value="/Users/ijong-ug/Documents/logback_log_dir"/>
     <!--<include resource="org/springframework/boot/logging/logback/defaults.xml"/>-->
 
+    <!-- logback이 정상 종료 설정 -->
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook" />
+
+    <!-- logback 색상 설정  -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+
     <!-- Appenders (현재 설정은 콘솔에 출력이 되는 설정이다.)-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- INFO 레벨 이상의 로그만 출력합니다 -->
@@ -18,7 +24,7 @@
         </filter>
         <!-- 로그 출력 형식을 정의합니다 -->
         <encoder>
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] %logger{30} %msg%n</pattern>
+            <pattern>%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){faint} %clr([%-5level]){red,bold} %clr([%thread]){blue} %clr(%logger{30}){cyan} %clr(%msg){green}%n</pattern>
         </encoder>
     </appender>
 

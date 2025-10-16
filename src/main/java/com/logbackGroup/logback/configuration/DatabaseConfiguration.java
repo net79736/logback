@@ -1,13 +1,11 @@
 package com.logbackGroup.logback.configuration;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import lombok.extern.slf4j.Slf4j;
+import javax.sql.DataSource;
+
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +15,10 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -33,6 +34,7 @@ public class DatabaseConfiguration {
     log.info("DatabaseConfiguration 생성자 메소드 출력(info)");
     log.debug("DatabaseConfiguration 생성자 메소드 출력(debug)");
     log.warn("DatabaseConfiguration 생성자 메소드 출력(warn)");
+    log.error("DatabaseConfiguration 생성자 메소드 출력(error)");
   }
 
   @Bean

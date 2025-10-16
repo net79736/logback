@@ -1,22 +1,22 @@
 <configuration scan="true" scanPeriod="30 seconds"><!--고르백 구현체가 설정을 확인하는 주기-->
-    <!--프로퍼티는 해당 파일 밑에서 편하게 변수를 사용하기 위해서 만들어 놓은 것을 의미한다.-->
-    <property name="moduleId" value="around_hub_spring_boot"/><!-- moduleId는 프로젝트가 설치된 폴더명 또는 구분할 수있는 식별자이면됨-->
-    <property name="type" value="around_hub"/> <!--로그파일명을 구성하는 인자-->
-    <property name="logback" value="logback"/> <!--로그를 저장할 최종 디렉토리명-->
-    <property name="logdir" value="D:\Workspace\LogFiles"/>
-    <!--<include resource="org/springframework/boot/logging/logback/defaults.xml"/>-->
-
     <!-- 외부 설정 파일을 사용하여 위의 property 태그를 만들어 보려고 한다. -->
     <property resource="properties/logback.properties"/>
     <property resource="application.properties"/>
 
+    <!--프로퍼티는 해당 파일 밑에서 편하게 변수를 사용하기 위해서 만들어 놓은 것을 의미한다.-->
+    <property name="moduleId" value="around_hub_spring_boot"/><!-- moduleId는 프로젝트가 설치된 폴더명 또는 구분할 수있는 식별자이면됨-->
+    <property name="type" value="around_hub"/> <!--로그파일명을 구성하는 인자-->
+    <property name="logback" value="logback"/> <!--로그를 저장할 최종 디렉토리명-->
+    <property name="logdir" value="/Users/ijong-ug/Documents/logback_log_dir"/>
+    <!--<include resource="org/springframework/boot/logging/logback/defaults.xml"/>-->
+
     <!-- Appenders (현재 설정은 콘솔에 출력이 되는 설정이다.)-->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!--DEBUG이상의 레벨을 출력을 하겠다.-->
+        <!-- INFO 레벨 이상의 로그만 출력합니다 -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
-        <!--실행 해 보면서 로그가 어떻게 출력이 되는지 확인해 보자.-->
+        <!-- 로그 출력 형식을 정의합니다 -->
         <encoder>
             <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] %logger{30} %msg%n</pattern>
         </encoder>
@@ -30,21 +30,68 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.file.backup.fileNamePattern}</fileNamePattern>
-            <maxFileSize>20MB</maxFileSize>
-            <maxHistory>50</maxHistory>
-            <totalSizeCap>1000MB</totalSizeCap>
+            <maxFileSize>20KB</maxFileSize><!-- 각 로그 파일의 최대 크기가 20KB를 초과하면 새로운 파일로 롤링 -->
+            <maxHistory>10</maxHistory><!-- 최대 10개의 로그 파일 유지 -->
+            <totalSizeCap>200KB</totalSizeCap><!-- 전체 로그 파일 크기가 200KB를 초과하면 오래된 파일부터 삭제 -->
         </rollingPolicy>
     </appender>
 
-    <logger name="org.springframework" level="OFF"/>
+    <!-- 특별한 로그 파일용 appender: com.example 패키지 전용 -->
+    <appender name="SPECIAL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/java_special_example.log</File>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] %logger{30} %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${logdir}/special-example.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="org.springframework" level="INFO"/>
     <!--logback 패키지는 WARN 레벨 이상만 출력하겠다.-->
     <logger name="com.logbackGroup.logback.infotest" level="INFO"/>
     <!--logback.configurationi 패키지는 WARN 레벨 이상만 출력하겠다.-->
-    <logger name="com.logbackGroup.logback.configuration" level="DEBUG"/>
+    <logger name="com.logbackGroup.logback.configuration" level="WARN"/>
 
-    <!-- 모든 패키지의 로그 중 INFO 레벨 이상만 출력하겠다면 root 레벨을 INFO로 변경한다. -->
-    <!-- 아래는 모든 패키지의 로그를 꺼버리고 뒤에서 overwrite한 logger 에서만 로그를 출력한다.  -->
-    <root level="OFF">
+    <!-- 
+        com.example 패키지는 root logger의 설정을 따르지 않습니다!
+        
+        🔍 이 설정의 의미:
+        1. level="DEBUG": root의 INFO 레벨을 무시하고 DEBUG 레벨로 설정
+        2. additivity="false": root logger로 로그를 전파하지 않음 (독립적으로 동작)
+        3. appender-ref ref="FILE": root의 STDOUT+FILE을 무시하고 FILE만 사용
+        
+        📊 결과:
+        - root 설정: INFO 레벨, STDOUT(콘솔) + FILE(파일) 출력
+        - com.example 설정: DEBUG 레벨, FILE(파일)만 출력, 콘솔에는 출력 안됨
+        
+        💡 핵심: additivity="false"로 인해 root logger와 완전히 독립적으로 동작합니다!
+    -->
+    <logger name="com.example" level="DEBUG" additivity="false">
+        <appender-ref ref="SPECIAL_FILE"/>
+    </logger>
+
+    <!-- 
+        Root Logger 설정 (기본 설정)
+        
+        🔍 이 설정의 의미:
+        1. level="INFO": 모든 패키지의 기본 로그 레벨을 INFO로 설정
+        2. appender-ref ref="STDOUT": 콘솔에 로그 출력
+        3. appender-ref ref="FILE": 파일에 로그 기록
+        
+        📊 적용 대상:
+        - 특별한 logger 설정이 없는 모든 패키지
+        - additivity="true"인 logger들 (기본값)
+        
+        ⚠️ 예외:
+        - com.example 패키지는 additivity="false"로 인해 이 설정을 따르지 않음
+        - org.springframework 패키지는 level="OFF"로 인해 로그 출력 안됨
+        - com.logbackGroup.logback.infotest, configuration 패키지는 각각 별도의 커스텀 설정을 하고있어 이 설정을 따르지 않음
+    -->
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
